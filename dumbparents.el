@@ -20,6 +20,18 @@
     )
   )
 
+;; Sees if there is a pair to complete
+(defun after-insert ()
+  (let ((c (char-to-string last-command-event)))
+    (when (member c normal_chars)
+      (unless (use-region-p)
+        (insert-opposite-char c)
+        (backward-char)
+        )
+      )
+    )
+  )
+
 ;; Surround
 (defun after-selected-insert ()
   (interactive)
@@ -54,39 +66,31 @@
   :group 'active-region
   )
 
-(defun refresh-shortcuts ()
-  (dolist (n normal_chars)
-    (define-key active-region-mode-map (kbd n) #'after-selected-insert)
-    )
-  )
-;; Sees if there is a pair to complete
-(defun after-insert ()
-  (let ((c (char-to-string last-command-event)))
-    (when (member c normal_chars)
-      (unless (use-region-p)
-        (insert-opposite-char c)
-        (backward-char)
-        )
-      )
-    )
-  )
-
 ;; Delete empty pairs of parens if any%
 (defun on-delete (orig-func n &optional killflag)
   (if (<= (point) (buffer-size))
       (let* ((start (max (point-min) (- (point) n)))
              (str (buffer-substring-no-properties start (point)))
-             (other (buffer-substring-no-properties (1+ start) (1+(point)))))
-        (when (member str normal_chars)
-          (when (member other opposite_chars)
+             (other (buffer-substring-no-properties (1+ start) (1+(point))))
+             (rest1 (member str normal_chars))
+             (rest2 (member other opposite_chars)))
+        (when (not(null rest1))
+          (when (= (length rest2) (length rest1))
             (delete-forward-char 1 (current-buffer))))))
   (funcall orig-func n killflag))
 
 (defun active-region-on () (active-region-mode 1))
 (defun active-region-off () (active-region-mode -1))
 
+(defun refresh-shortcuts ()
+  (dolist (n normal_chars)
+    (define-key active-region-mode-map (kbd n) #'after-selected-insert)
+    )
+  )
+
 (add-hook 'post-self-insert-hook 'after-insert)
 (add-hook 'activate-mark-hook 'active-region-on)
 (add-hook 'deactivate-mark-hook 'active-region-off)
 (advice-add #'delete-backward-char :around #'on-delete)
+
 (refresh-shortcuts)
