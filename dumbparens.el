@@ -1,14 +1,14 @@
-;;; dumbparens.el
+;;; dumbparens.el --- Attempts to make paren pairs and tries to not be smart about it -*- lexical-binding: t; -*-
 ;;
-;; Copyright (C) 2023 Stigl
+;; Copyright (C) 2024-2024 Stigl
 ;;
 ;; Author: Stigl <stigl@ireview.games>
 ;; Maintainer: Stigl <stigl@ireview.games>
 ;; Created: December 25, 2024
-;; Modified: December 27, 2023
+;; Modified: December 27, 2024
 ;; Version: 1.0.0
 ;; Homepage: https://github.com/StiglCZ/Dumbparens
-;; Package-Requires: ((emacs "29.4"))
+;; Package-Requires: ((emacs "26.4"))
 ;;
 ;; This program is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -21,37 +21,37 @@
 ;; GNU General Public License for more details.
 ;;
 ;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
-;;
-;;; Commentary:
-;;
-;; Due to the currently ongoing issue of doing pairs propertly in smartparens this had to be made
-;;
-
+;; along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 ; Set your pairs
-(setq normal_chars   '("(" "[" "{" "\""))
-(setq opposite_chars '(")" "]" "}" "\""))
+
+;;;###autoload
+(defun dumbparens ()
+  (interactive)
+  (setq dp_normal_chars   '("(" "[" "{" "\""))
+  (setq dp_opposite_chars '(")" "]" "}" "\""))
+  (dp-refresh-shortcuts)
+  )
 
 ; Inserts a matching character from the opposite_chars list
-(defun insert-opposite-char (c)
-  (unless (eq (length normal_chars) (length opposite_chars))
+(defun dp-insert-opposite-char (c)
+  (unless (eq (length dp_normal_chars) (length dp_opposite_chars))
     (message "Your chars don't match")
     )
-  (let ((len (length (member c normal_chars)))
-        (orig_len (length opposite_chars)))
+  (let ((len (length (member c dp_normal_chars)))
+        (orig_len (length dp_opposite_chars)))
     (let ((oc (- orig_len len)))
-      (insert (nth oc opposite_chars))
+      (insert (nth oc dp_opposite_chars))
       )
     )
   )
 
 ;; Sees if there is a pair to complete
-(defun after-insert ()
+(defun dp-after-insert ()
   (let ((c (char-to-string last-command-event)))
-    (when (member c normal_chars)
+    (when (member c dp_normal_chars)
       (unless (use-region-p)
-        (insert-opposite-char c)
+        (dp-insert-opposite-char c)
         (backward-char)
         )
       )
@@ -69,7 +69,7 @@
       (goto-char b)
       (insert c)
       (goto-char (1+ e))
-      (insert-opposite-char c)
+      (dp-insert-opposite-char c)
       )
 
     (set-mark b)
@@ -79,44 +79,46 @@
     )
   )
 
-(defvar active-region-mode-map
+(defvar dp-active-region-mode-map
   (let ((map (make-sparse-keymap)))
     map)
   )
 
-(define-minor-mode active-region-mode
+(define-minor-mode dp-active-region-mode
   ""
   :init-value nil
   :lighter " Region"
-  :keymap active-region-mode-map
-  :group 'active-region
+  :keymap dp-active-region-mode-map
+  :group 'dp-active-region
   )
 
 ;; Delete empty pairs of parens if any%
-(defun on-delete (orig-func n &optional killflag)
+(defun dp-on-delete (orig-func n &optional killflag)
   (if (<= (point) (buffer-size))
       (let* ((start (max (point-min) (- (point) n)))
              (str (buffer-substring-no-properties start (point)))
              (other (buffer-substring-no-properties (1+ start) (1+(point))))
-             (rest1 (member str normal_chars))
-             (rest2 (member other opposite_chars)))
+             (rest1 (member str dp_normal_chars))
+             (rest2 (member other dp_opposite_chars)))
         (when (not(null rest1))
           (when (= (length rest2) (length rest1))
             (delete-forward-char 1 (current-buffer))))))
   (funcall orig-func n killflag))
 
-(defun active-region-on () (active-region-mode 1))
-(defun active-region-off () (active-region-mode -1))
+(defun dp-active-region-on () (dp-active-region-mode 1))
+(defun dp-active-region-off () (dp-active-region-mode -1))
 
-(defun refresh-shortcuts ()
-  (dolist (n normal_chars)
-    (define-key active-region-mode-map (kbd n) #'after-selected-insert)
+;;;###autoload
+(defun dp-refresh-shortcuts ()
+  (interactive)
+  (dolist (n dp_normal_chars)
+    (define-key dp-active-region-mode-map (kbd n) #'after-selected-insert)
     )
   )
 
-(add-hook 'post-self-insert-hook 'after-insert)
-(add-hook 'activate-mark-hook 'active-region-on)
-(add-hook 'deactivate-mark-hook 'active-region-off)
-(advice-add #'delete-backward-char :around #'on-delete)
+(add-hook 'post-self-insert-hook 'dp-after-insert)
+(add-hook 'activate-mark-hook 'dp-active-region-on)
+(add-hook 'deactivate-mark-hook 'dp-active-region-off)
+(advice-add #'delete-backward-char :around #'dp-on-delete)
 
-(refresh-shortcuts)
+;;; dumbparens.el ends here
