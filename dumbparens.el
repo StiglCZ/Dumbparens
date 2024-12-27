@@ -1,14 +1,14 @@
-;;; dumbparens.el --- Upload sharing to 0x0.st -*- lexical-binding: t; -*-
+;;; dumbparens.el
 ;;
-;; Copyright (C) 2023 William Vaughn
+;; Copyright (C) 2023 Stigl
 ;;
-;; Author: William Vaughn <vaughnwilld@gmail.com>
-;; Maintainer: William Vaughn <vaughnwilld@gmail.com>
-;; Created: June 26, 2021
-;; Modified: August 16, 2023
-;; Version: 1.0.1
-;; Homepage: https://git.sr.ht/~willvaughn/emacs-0x0
-;; Package-Requires: ((emacs "26.1"))
+;; Author: Stigl <stigl@ireview.games>
+;; Maintainer: Stigl <stigl@ireview.games>
+;; Created: December 25, 2024
+;; Modified: December 27, 2023
+;; Version: 1.0.0
+;; Homepage: https://github.com/StiglCZ/Dumbparens
+;; Package-Requires: ((emacs "29.4"))
 ;;
 ;; This program is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -25,20 +25,8 @@
 ;;
 ;;; Commentary:
 ;;
-;; Integration with https://0x0.st, envs.sh, ttm.sh, and self-hosted services
-;;
-;; Upload whatever you need to a pastebin server. The commands
-;; `0x0-upload-file',`0x0-upload-text' and `0x0-upload-kill-ring', which
-;; respectively upload (parts of) the current buffer, a file on your disk and a
-;; string from the minibuffer can be used too.
-;;
-;; The default host and the host this package is named after is https://0x0.st.
-;; Consider donating to https://liberapay.com/mia/donate if you like the service.
-
-
-;; DumbParens
-;;
 ;; Due to the currently ongoing issue of doing pairs propertly in smartparens this had to be made
+;;
 
 
 ; Set your pairs
