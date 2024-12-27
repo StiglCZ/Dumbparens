@@ -23,13 +23,12 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-; Set your pairs
+(setq dp_normal_chars   '("(" "[" "{" "\""))
+(setq dp_opposite_chars '(")" "]" "}" "\""))
 
 ;;;###autoload
 (defun dumbparens ()
   (interactive)
-  (setq dp_normal_chars   '("(" "[" "{" "\""))
-  (setq dp_opposite_chars '(")" "]" "}" "\""))
   (dp-refresh-shortcuts)
   )
 
