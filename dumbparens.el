@@ -102,6 +102,16 @@
 (defun dp-active-region-off () (dp-active-region-mode -1))
 
 ;;;###autoload
+(defun dumbparens ()
+  (interactive)
+  (dp-refresh-shortcuts)
+  (add-hook 'post-self-insert-hook 'dp-after-insert)
+  (add-hook 'activate-mark-hook 'dp-active-region-on)
+  (add-hook 'deactivate-mark-hook 'dp-active-region-off)
+  (advice-add #'delete-backward-char :around #'dp-on-delete)
+  )
+
+;;;###autoload
 (defun dp-refresh-shortcuts ()
   (interactive)
   (dolist (n dp_normal_chars)
@@ -109,15 +119,5 @@
     )
   )
 
-;;;###autoload
-(defun dumbparens ()
-  (interactive)
-  (dp-refresh-shortcuts)
-  )
-
-(add-hook 'post-self-insert-hook 'dp-after-insert)
-(add-hook 'activate-mark-hook 'dp-active-region-on)
-(add-hook 'deactivate-mark-hook 'dp-active-region-off)
-(advice-add #'delete-backward-char :around #'dp-on-delete)
-
+(provide 'dumbparens)
 ;;; dumbparens.el ends here
