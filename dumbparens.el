@@ -26,12 +26,6 @@
 (setq dp_normal_chars   '("(" "[" "{" "\""))
 (setq dp_opposite_chars '(")" "]" "}" "\""))
 
-;;;###autoload
-(defun dumbparens ()
-  (interactive)
-  (dp-refresh-shortcuts)
-  )
-
 ; Inserts a matching character from the opposite_chars list
 (defun dp-insert-opposite-char (c)
   (unless (eq (length dp_normal_chars) (length dp_opposite_chars))
@@ -58,7 +52,7 @@
   )
 
 ;; Surround
-(defun after-selected-insert ()
+(defun dp-after-selected-insert ()
   (interactive)
   (setq deactivate-mark nil)
   (let ((c (char-to-string last-command-event))
@@ -111,8 +105,14 @@
 (defun dp-refresh-shortcuts ()
   (interactive)
   (dolist (n dp_normal_chars)
-    (define-key dp-active-region-mode-map (kbd n) #'after-selected-insert)
+    (define-key dp-active-region-mode-map (kbd n) #'dp-after-selected-insert)
     )
+  )
+
+;;;###autoload
+(defun dumbparens ()
+  (interactive)
+  (dp-refresh-shortcuts)
   )
 
 (add-hook 'post-self-insert-hook 'dp-after-insert)
